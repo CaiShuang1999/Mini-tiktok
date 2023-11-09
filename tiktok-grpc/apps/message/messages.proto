@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option go_package="./messages_pb";
+
+package messages_pb; 
+
+
+//定义消息体(字段=序列号)
+
+
+message MessageInfo{
+    int64 id=1;
+    int64 to_user_id=2;
+    int64 from_user_id=3;
+    string content=4;
+    int64 create_time=5;
+}
+
+
+message MessageActionRequest {
+  string to_user_id = 1;
+  string token = 2;
+  string action_type=3;
+  string content=4;
+}
+
+message MessageActionResponse {
+  int64 status_code = 1;  
+  string status_msg = 2;
+}
+
+message MessageListRequest {
+    string to_user_id = 1;
+    string token = 2;
+    string pre_msg_time= 3;
+}
+  
+message MessageListResponse {
+    int64 status_code = 1;  
+    string status_msg = 2;
+  repeated MessageInfo message_list =3;
+}
+
+//定义服务接口
+
+service MessageService {
+  rpc MessageAction(MessageActionRequest ) returns (MessageActionResponse);
+  rpc GetMessageList(MessageListRequest) returns (MessageListResponse);
+
+}
+

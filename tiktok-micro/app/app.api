@@ -1,0 +1,322 @@
+type (
+	UserInfo {
+		ID              int64  `gorm:"primaryKey;type:mediumint unsigned" json:"id"  redis:"-"`                            // 用户id(gorm主键自增)
+		Name            string `gorm:"not null;unique;size:32" json:"name" redis:"name"`                                   // 用户名称
+		Password        string `gorm:"not null" json:"-" redis:"-"`                                                        //密码(返回json时，不包括密码)
+		Avatar          string `gorm:"default:'/default/avatar.jpg'" json:"avatar" redis:"avatar"`                         // 用户头像
+		BackgroundImage string `gorm:"default:'/default/background.jpg'" json:"background_image" redis:"background_image"` // 用户个人页顶部大图
+		FavoriteCount   int64  `gorm:"type:mediumint unsigned" json:"favorite_count" redis:"favorite_count"`               // 喜欢数
+		WorkCount       int64  `gorm:"type:smallint(5) unsigned" json:"work_count" redis:"work_count"`                     // 作品数
+		FollowCount     int64  `gorm:"type:smallint(5) unsigned" json:"follow_count" redis:"follow_count"`                 // 关注总数
+		FollowerCount   int64  `gorm:"type:mediumint unsigned" json:"follower_count" redis:"follower_count"`               // 粉丝总数
+		IsFollow        bool   `gorm:"-" json:"is_follow" redis:"-"`                                                       // true-已关注，false-未关注
+		Signature       string `gorm:"default:'默认个人签名!'" json:"signature,omitempty"  redis:"signature"`                    // 个人简介
+		TotalFavorited  int64  `gorm:"type:mediumint unsigned" json:"total_favorited" redis:"-"`                           // 获赞数量
+
+	}
+	VideoInfo {
+		ID            int64    `json:"id"`
+		Author        UserInfo `json:"author"`
+		PlayURL       string   `json:"play_url"`
+		CoverURL      string   `json:"cover_url"`
+		FavoriteCount int64    `json:"favorite_count"`
+		CommentCount  int64    `json:"comment_count"`
+		IsFavorite    bool     `json:"is_favorite"`
+		Title         string   `json:"title"`
+	}
+)
+
+type (
+	// 用户登录
+	LoginRequest {
+		Username string `form:"username"`
+		Password string `form:"password"`
+	}
+	LoginResponse {
+		StatusCode int64  `json:"status_code"`
+		StatusMsg  string `json:"status_msg"`
+		UserId     int64  `json:"user_id"`
+		Token      string `json:"token"`
+	}
+	// 用户登录
+
+	// 用户注册
+	RegisterRequest {
+		Username string `form:"username"`
+		Password string `form:"password"`
+	}
+	RegisterResponse {
+		StatusCode int64  `json:"status_code"`
+		StatusMsg  string `json:"status_msg"`
+		UserId     int64  `json:"user_id"`
+		Token      string `json:"token"`
+	}
+	// 用户注册
+
+	// 用户信息
+	UserInfoRequest {
+		UserId string `form:"user_id"`
+		Token  string `form:"token"`
+	}
+
+	UserInfoResponse {
+		StatusCode int64    `json:"status_code"`
+		StatusMsg  string   `json:"status_msg"`
+		User       UserInfo `json:"user"`
+	}
+)
+
+type (
+	// 投稿接口
+	PublishRequest {
+		Token string `form:"token"`
+		Title string `form:"title"`
+	}
+	PublishResponse {
+		StatusCode int64  `json:"status_code"`
+		StatusMsg  string `json:"status_msg"`
+	}
+	// 投稿接口
+
+	// 发布列表
+	PublishListRequest {
+		UserID string `form:"user_id"`
+		Token  string `form:"token,optional"`
+	}
+	PublishListResponse {
+		StatusCode int64        `json:"status_code"`
+		StatusMsg  string       `json:"status_msg"`
+		Videos     []*VideoInfo `json:"video_list"`
+	}
+)
+
+type (
+	FeedRequest {
+		LatestTime string `form:"latest_time,optional"`
+		Token      string `form:"token,optional"`
+	}
+	FeedResponse {
+		StatusCode int64        `json:"status_code"`
+		StatusMsg  string       `json:"status_msg"`
+		Videos     []*VideoInfo `json:"video_list"`
+	}
+)
+
+type (
+	FavoriteActionRequest {
+		VideoId    string `form:"video_id"`
+		Token      string `form:"token"`
+		ActionType string `form:"action_type"`
+	}
+	FavoriteActionResponse {
+		StatusCode int64  `json:"status_code"`
+		StatusMsg  string `json:"status_msg"`
+	}
+
+	FavoriteListRequest {
+		UserId string `form:"user_id"`
+		Token  string `form:"token"`
+	}
+	FavoriteListResponse {
+		StatusCode int64        `json:"status_code"`
+		StatusMsg  string       `json:"status_msg"`
+		Videos     []*VideoInfo `json:"video_list"`
+	}
+)
+
+//评论
+type (
+	CommentInfo {
+		ID         int64    `json:"id"`
+		User       UserInfo `json:"user"`
+		Content    string   `json:"content"`
+		CreateDate string   `json:"create_date"`
+	}
+
+	CommentActionRequest {
+		VideoId     string `form:"video_id"`
+		Token       string `form:"token"`
+		ActionType  string `form:"action_type"`
+		CommentText string `form:"comment_text,optional"`
+		CommentID   string `form:"comment_id,optional"`
+	}
+	CommentActionResponse {
+		StatusCode int64       `json:"status_code"`
+		StatusMsg  string      `json:"status_msg"`
+		Comment    CommentInfo `json:"comment"`
+	}
+
+	CommentListRequest {
+		VideoId string `form:"video_id"`
+		Token   string `form:"token"`
+	}
+	CommentListResponse {
+		StatusCode int64          `json:"status_code"`
+		StatusMsg  string         `json:"status_msg"`
+		Comments   []*CommentInfo `json:"comment_list"`
+	}
+)
+//relation
+type (
+	RelationActionRequest {
+		ToUserId   string `form:"to_user_id"`
+		Token      string `form:"token"`
+		ActionType string `form:"action_type"`
+	}
+	RelationActionResponse {
+		StatusCode int64  `json:"status_code"`
+		StatusMsg  string `json:"status_msg"`
+	}
+
+	FollowListRequest {
+		UserId string `form:"user_id"`
+		Token  string `form:"token"`
+	}
+	FollowListResponse {
+		StatusCode int64       `json:"status_code"`
+		StatusMsg  string      `json:"status_msg"`
+		Follows    []*UserInfo `json:"user_list"`
+	}
+
+	FollowerListRequest {
+		UserId string `form:"user_id"`
+		Token  string `form:"token"`
+	}
+	FollowerListResponse {
+		StatusCode int64       `json:"status_code"`
+		StatusMsg  string      `json:"status_msg"`
+		Followers  []*UserInfo `json:"user_list"`
+	}
+
+	FriendListRequest {
+		UserId string `form:"user_id"`
+		Token  string `form:"token"`
+	}
+	FriendListResponse {
+		StatusCode int64       `json:"status_code"`
+		StatusMsg  string      `json:"status_msg"`
+		Friends    []*UserInfo `json:"user_list"`
+	}
+)
+
+type (
+	MessageInfo {
+		ID         int64  `json:"id"`
+		ToUserId   int64  `json:"to_user_id"`
+		FromUserId int64  `json:"from_user_id"`
+		Content    string `json:"content"`
+		CreateTime int64  `json:"create_time"`
+	}
+
+	MessageActionRequest {
+		TOUserId   string `form:"to_user_id"`
+		Token      string `form:"token"`
+		ActionType string `form:"action_type"`
+		Content    string `form:"content"`
+	}
+	MessageActionResponse {
+		StatusCode int64  `json:"status_code"`
+		StatusMsg  string `json:"status_msg"`
+	}
+
+	MessageListRequest {
+		ToUserId   string `form:"to_user_id"`
+		Token      string `form:"token"`
+		PreMsgTime string `form:"pre_msg_time"`
+	}
+	MessageListResponse {
+		StatusCode  int64          `json:"status_code"`
+		StatusMsg   string         `json:"status_msg"`
+		MessageList []*MessageInfo `json:"message_list"`
+	}
+)
+
+@server (
+	group:  user
+)
+service APP {
+	@handler Login
+	post /douyin/user/login(LoginRequest) returns (LoginResponse)
+	@handler Register
+	post /douyin/user/register(RegisterRequest) returns (RegisterResponse)
+	@handler UserInfo
+	get /douyin/user(UserInfoRequest) returns (UserInfoResponse)
+}
+
+/*
+type (
+	TestRequest {
+		VideoID string `form:"video_id"`
+		Token   string `form:"token"`
+	}
+	TestResponse {
+		StatusCode int64      `json:"status_code"`
+		StatusMsg  string     `json:"status_msg"`
+		VideoInfo  *VideoInfo `json:"video_info"`
+	}
+)
+*/
+@server (
+	group:  video
+)
+service APP {
+	@handler Publish
+	post /douyin/publish/action(PublishRequest) returns (PublishResponse)
+	@handler PublishList
+	get /douyin/publish/list(PublishListRequest) returns (PublishListResponse)
+	//@handler GetVideoInfo
+	//get /douyin/videoinfo(TestRequest) returns (TestResponse)
+}
+
+@server (
+	group:  feed
+)
+service APP {
+	@handler Feed
+	get /douyin/feed(FeedRequest) returns (FeedResponse)
+}
+
+@server (
+	group:  favorite
+)
+service APP {
+	@handler FavoriteAction
+	post /douyin/favorite/action(FavoriteActionRequest) returns (FavoriteActionResponse)
+	@handler FavoriteList
+	get /douyin/favorite/list(FavoriteListRequest) returns (FavoriteListResponse)
+}
+
+@server (
+	group:  comment
+)
+service APP {
+	@handler CommentAction
+	post /douyin/comment/action(CommentActionRequest) returns (CommentActionResponse)
+	@handler CommentList
+	get /douyin/comment/list(CommentListRequest) returns (CommentListResponse)
+}
+
+@server (
+	group:  relation
+)
+service APP {
+	@handler RelationAction
+	post /douyin/relation/action(RelationActionRequest) returns (RelationActionResponse)
+	@handler FollowList
+	get /douyin/relation/follow/list(FollowListRequest) returns (FollowListResponse)
+	@handler FollowerList
+	get /douyin/relation/follower/list(FollowerListRequest) returns (FollowerListResponse)
+	@handler FriendList
+	get /douyin/relation/friend/list(FriendListRequest) returns (FriendListResponse)
+}
+
+@server (
+	group:  message
+)
+service APP {
+	@handler MessageAction
+	post /douyin/message/action(MessageActionRequest) returns (MessageActionResponse)
+	@handler MessageList
+	get /douyin/message/chat(MessageListRequest) returns (MessageListResponse)
+
+}

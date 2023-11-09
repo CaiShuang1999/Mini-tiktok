@@ -1,0 +1,45 @@
+Name: APP
+Host: 0.0.0.0
+Port: 8080
+
+UserRpc:
+  Etcd:
+   Hosts:
+   - 127.0.0.1:2379
+   Key: user.rpc
+
+VideoRpc:
+  Etcd:
+   Hosts:
+   - 127.0.0.1:2379
+   Key: video.rpc
+
+FeedRpc:
+  Etcd:
+   Hosts:
+   - 127.0.0.1:2379
+   Key: feed.rpc
+
+FavoriteRpc:
+  Etcd:
+   Hosts:
+   - 127.0.0.1:2379
+   Key: favorite.rpc
+
+CommentRpc:
+  Etcd:
+   Hosts:
+   - 127.0.0.1:2379
+   Key: comment.rpc
+
+RelationRpc:
+  Etcd:
+   Hosts:
+   - 127.0.0.1:2379
+   Key: relation.rpc
+
+MessageRpc:
+  Etcd:
+   Hosts:
+   - 127.0.0.1:2379
+   Key: messages.rpc

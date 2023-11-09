@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+option go_package="./relation_pb";
+
+package relation_pb;
+
+
+//定义消息体(字段=序列号)
+
+message UserInfo{
+  
+    int64 id=1;
+    string name=2;
+    int64  follow_count=3;
+    int64 follower_count=4;
+    bool is_follow=5;
+    string avatar=6;
+    string background_image=7;
+    string signature=8;
+    int64 total_favorited=9;
+    int64 work_count=10;
+    int64 favorite_count=11;
+}
+
+
+message RelationActionRequest {
+  string token = 1;
+  string to_user_id = 2;
+  string action_type=3;
+}
+
+message RelationActionResponse {
+  int64 status_code = 1;  
+  string status_msg = 2;
+}
+
+
+message GetFollowListRequest {
+    string user_id = 1;
+    string token = 2;
+  }
+  
+message GetFollowListResponse {
+    int64 status_code = 1;  
+    string status_msg = 2;
+    repeated UserInfo user_list=3;
+}
+
+
+message GetFansListRequest {
+    string user_id = 1;
+    string token = 2;
+  }
+  
+message GetFansListResponse {
+    int64 status_code = 1;  
+    string status_msg = 2;
+    repeated UserInfo user_list=3;
+}
+
+
+message GetFriendListRequest {
+    string user_id = 1;
+    string token = 2;
+  }
+  
+message GetFriendListResponse {
+    int64 status_code = 1;  
+    string status_msg = 2;
+    repeated UserInfo user_list=3;
+}
+//定义服务接口
+
+service RelationService {
+  rpc RelationAction(RelationActionRequest) returns (RelationActionResponse);
+  rpc GetFollowList(GetFollowListRequest) returns (GetFollowListResponse);
+  rpc GetFansList(GetFansListRequest) returns (GetFansListResponse);
+  rpc GetFriendList(GetFriendListRequest) returns (GetFriendListResponse);
+}
+

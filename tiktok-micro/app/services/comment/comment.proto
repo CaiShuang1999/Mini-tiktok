@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+option go_package="./comment_pb";
+
+package comment_pb;
+
+
+//定义消息体(字段=序列号)
+
+message UserInfo{
+  
+    int64 id=1;
+    string name=2;
+    int64  follow_count=3;
+    int64 follower_count=4;
+    bool is_follow=5;
+    string avatar=6;
+    string background_image=7;
+    string signature=8;
+    int64 total_favorited=9;
+    int64 work_count=10;
+    int64 favorite_count=11;
+}
+
+
+message Comment {
+    int64 id=1;
+    UserInfo user=2;
+    string content=3;
+    string create_date=4;
+}
+
+
+message CommentActionRequest {
+  string video_id = 1;
+  string token = 2;
+  string action_type=3;
+  string comment_text=4;
+  string comment_id=5;
+
+}
+
+message CommentActionResponse {
+  int64 status_code = 1;  
+  string status_msg = 2;
+  Comment comment=3;
+}
+
+
+message CommentListRequest {
+    string video_id = 1;
+    string token = 2;
+
+  
+  }
+  
+  message CommentListResponse {
+    int64 status_code = 1;  
+    string status_msg = 2;
+    repeated Comment comment_list=3;
+  }
+
+
+//定义服务接口
+
+service CommentService {
+  rpc CommentAction(CommentActionRequest) returns (CommentActionResponse);
+  rpc CommentList(CommentListRequest) returns (CommentListResponse);
+  
+}
+

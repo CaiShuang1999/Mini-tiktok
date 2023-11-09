@@ -1,0 +1,26 @@
+Name: messages.rpc
+ListenOn: 127.0.0.1:8093  #和api的rpc监听端口对接
+
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: messages.rpc
+
+UserRpc:
+ Endpoints:  
+        - 127.0.0.1:8081  #用户rpc端口
+
+Nginx:
+  Addr: 10.23.65.182:80   
+
+
+MySQLDB:  
+  DataSource: root:sql1515534009@tcp(127.0.0.1:3306)/chat?charset=utf8mb4&parseTime=True&loc=Local
+  
+RedisDB_0:
+  Addr: 127.0.0.1:6379
+  DB: 0
+
+RedisDB_1:
+  Addr: 127.0.0.1:6379
+  DB: 1

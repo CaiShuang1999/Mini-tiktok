@@ -1,0 +1,23 @@
+Name: feed.rpc
+ListenOn: 127.0.0.1:8085   #和api的rpc监听端口对接
+
+
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: feed.rpc
+
+Nginx:
+  Addr: 10.23.65.182:80   
+
+
+MySQLDB:  
+  DataSource: root:sql1515534009@tcp(127.0.0.1:3306)/chat?charset=utf8mb4&parseTime=True&loc=Local
+  
+RedisDB_0:
+  Addr: 127.0.0.1:6379
+  DB: 0
+
+RedisDB_1:
+  Addr: 127.0.0.1:6379
+  DB: 1

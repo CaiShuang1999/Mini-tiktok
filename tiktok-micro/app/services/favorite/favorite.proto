@@ -1,0 +1,68 @@
+syntax = "proto3";
+option go_package="./favorite_pb";
+package favorite_pb; 
+
+
+//定义消息体(字段=序列号)
+
+
+message UserInfo{
+  int64   id=1;
+  string  name=2;
+  int64   follow_count=3;
+  int64   follower_count=4;
+  bool    is_follow=5;
+  string  avatar=6;
+  string  background_image=7;
+  string  signature=8;
+  int64   total_favorited=9;
+  int64   work_count=10;
+  int64   favorite_count=11;
+}
+message VideoInfo{
+  int64     id = 1;
+  UserInfo  author=2;
+  int64     comment_count=3 ;
+  string    cover_url=4;
+  int64     favorite_count=5;
+  bool      is_favorite =6;
+  string    play_url=7;
+  string    title=8;
+  int64     create_time=9;
+
+}
+
+
+message FavoriteActionRequest {
+  string token = 1;
+  string video_id = 2;
+  string action_type=3;
+}
+
+message FavoriteActionResponse {
+  int64 status_code = 1;  
+  string status_msg = 2;
+
+}
+
+message FavoriteListRequest {
+    string token = 1;
+    string user_id = 2;
+  }
+  
+  message FavoriteListResponse {
+    int64 status_code = 1;  
+    string status_msg = 2;
+    repeated VideoInfo video_list=3;
+  }
+
+
+
+
+//定义服务接口
+
+service FavoriteService {
+  rpc FavoriteAction (FavoriteActionRequest) returns (FavoriteActionResponse);
+  rpc FavoriteList (FavoriteListRequest) returns (FavoriteListResponse);
+}
+

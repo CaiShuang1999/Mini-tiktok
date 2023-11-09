@@ -1,0 +1,16 @@
+database:
+  host: 127.0.0.1 
+  port: 3306
+  username: root
+  password: sql1515534009
+  dbname : chat
+  charset: utf8mb4
+  parseTime: true
+  loc: Local
+
+
+NginxStatic:
+  host: 10.23.65.182   
+  port: 80
+
+

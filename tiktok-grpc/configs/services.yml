@@ -1,0 +1,27 @@
+userService:
+  host: localhost
+  port: 8081
+
+feedService:
+  host: localhost
+  port: 8084
+
+videoService:
+  host: localhost
+  port: 8088
+
+favoriteService:
+  host: localhost
+  port: 8090
+
+commentService:
+  host: localhost
+  port: 8094
+
+messageService:
+  host: localhost
+  port: 8096
+
+relationService:
+  host: localhost
+  port: 8098
