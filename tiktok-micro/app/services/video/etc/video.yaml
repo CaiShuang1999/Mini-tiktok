@@ -8,7 +8,7 @@ Etcd:
 
 
 Nginx:
-  Addr: 10.23.65.182:80   
+  Addr: IP:80   
 
 UserRpc:
  Endpoints:  
