@@ -9,7 +9,7 @@ database:
   loc: Local
 
 NginxStatic:
-  host: 10.23.65.182   
+  host: -
   port: 80
 
 

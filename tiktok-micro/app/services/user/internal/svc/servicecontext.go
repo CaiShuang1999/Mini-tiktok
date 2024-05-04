@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"tiktok-micro/app/services/user/internal/config"
+	"tiktok-micro/model"
 
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
@@ -52,15 +53,15 @@ func MysqlDBinit(dbConnectionString string) (*gorm.DB, error) {
 		return nil, err
 	}
 	fmt.Println("数据库连接成功！")
-	/*
-		err = db.AutoMigrate(&model.User{}, &model.Video{}, &model.Favorite{},
-			&model.Comment{}, &model.Relation{}, &model.Message{})
-		if err != nil {
-			fmt.Println("数据表迁移错误!")
-			return nil, err
-		}
-		fmt.Println("数据表迁移成功!")
-	*/
+
+	err = db.AutoMigrate(&model.User{}, &model.Video{}, &model.Favorite{},
+		&model.Comment{}, &model.Relation{}, &model.Message{})
+	if err != nil {
+		fmt.Println("数据表迁移错误!")
+		return nil, err
+	}
+	fmt.Println("数据表迁移成功!")
+
 	return db, nil
 }
 

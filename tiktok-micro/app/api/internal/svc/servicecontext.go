@@ -14,10 +14,11 @@ import (
 )
 
 type ServiceContext struct {
-	Config      config.Config
-	UserRpc     userservice.UserService
-	VideoRpc    videoservice.VideoService
-	FeedRpc     feedservice.FeedService
+	Config   config.Config
+	UserRpc  userservice.UserService
+	VideoRpc videoservice.VideoService
+	FeedRpc  feedservice.FeedService
+
 	FavoriteRpc favoriteservice.FavoriteService
 	CommentRpc  commentservice.CommentService
 	RelationRpc relationservice.RelationService
@@ -26,10 +27,11 @@ type ServiceContext struct {
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
-		Config:      c,
-		UserRpc:     userservice.NewUserService(zrpc.MustNewClient(c.UserRpc)),
-		VideoRpc:    videoservice.NewVideoService(zrpc.MustNewClient(c.VideoRpc)),
-		FeedRpc:     feedservice.NewFeedService(zrpc.MustNewClient(c.FeedRpc)),
+		Config:   c,
+		UserRpc:  userservice.NewUserService(zrpc.MustNewClient(c.UserRpc)),
+		VideoRpc: videoservice.NewVideoService(zrpc.MustNewClient(c.VideoRpc)),
+		FeedRpc:  feedservice.NewFeedService(zrpc.MustNewClient(c.FeedRpc)),
+
 		FavoriteRpc: favoriteservice.NewFavoriteService(zrpc.MustNewClient(c.FavoriteRpc)),
 		CommentRpc:  commentservice.NewCommentService(zrpc.MustNewClient(c.CommentRpc)),
 		RelationRpc: relationservice.NewRelationService(zrpc.MustNewClient(c.RelationRpc)),

@@ -10,7 +10,7 @@ database:
 
 
 NginxStatic:
-  host: 10.23.65.182   
+  host: 10.23.65.216 
   port: 80
 
 

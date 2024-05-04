@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"strconv"
 	"tiktok-grpc/apps/user/pb"
 	"tiktok-grpc/cmd"
 	"tiktok-grpc/common/jwtx"
@@ -110,11 +109,10 @@ func (p *UserServiceServer) Login(ctx context.Context, req *pb.LoginRequest) (*p
 func (p *UserServiceServer) GetUser(ctx context.Context, req *pb.UserInfoRequest) (*pb.UserInfoResponse, error) {
 	userID := req.UserId
 	token := req.Token //获取前端注册用户ID和token
-	userIDi, _ := strconv.Atoi(userID)
-	//判断token是否有效
-	tokenmsg, ok := jwtx.ParseToken(token)
 
-	if int(tokenmsg.UserID) == userIDi && ok {
+	_, ok := jwtx.ParseToken(token)
+
+	if ok {
 
 		user, err := redisx.UserCache(userID)
 		if err != nil {

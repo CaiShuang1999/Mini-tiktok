@@ -31,7 +31,6 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	// Message传回gin的JSON
 	c.JSON(http.StatusOK, res)
 

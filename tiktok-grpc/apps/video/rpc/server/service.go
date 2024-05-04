@@ -2,11 +2,12 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
-
 	"strconv"
+	user_pb "tiktok-grpc/apps/user/pb"
 	"tiktok-grpc/apps/video/video_pb"
 	cmdx "tiktok-grpc/cmd"
 	"tiktok-grpc/common/jwtx"
@@ -15,6 +16,9 @@ import (
 	"tiktok-grpc/model"
 	"time"
 
+	"github.com/spf13/viper"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"gorm.io/gorm"
 )
 
@@ -57,22 +61,26 @@ func (p *VideoServiceServer) UploadVideo(ctx context.Context, req *video_pb.Uplo
 
 	//上传成功后，video表数据库
 	db := cmdx.DB
+	tx := db.Begin()
 	var newVideo model.Video
 	newVideo.UserID = tokenmsg.UserID
 	newVideo.PlayURL = cmdx.StaticUrl + "/video/" + useridstring + "_" + timestampString + "." + fileNameType
 	newVideo.Title = req.Title
 	newVideo.CoverURL = cmdx.StaticUrl + "/image/" + useridstring + "_" + timestampString + ".jpg"
 	newVideo.CreateTime = timestamp
-	result := db.Create(&newVideo) //数据库创建video记录
-	if result.Error != nil {
+
+	if err := tx.Create(&newVideo).Error; err != nil {
+		tx.Rollback()
 		os.Remove(outputFile) //删除已上传的视频，保持一致性
 		os.Remove(savePath)
 		return &video_pb.UploadVideoResponse{StatusCode: 1, StatusMsg: "创建数据库记录失败！"}, nil
 	}
-
 	//sql记录修改(作品+1)
-	db.Model(&model.User{}).Where("id = ?", tokenmsg.UserID).Update("work_count", gorm.Expr("work_count + ?", 1))
-
+	if err := tx.Model(&model.User{}).Where("id = ?", tokenmsg.UserID).Update("work_count", gorm.Expr("work_count + ?", 1)).Error; err != nil {
+		tx.Rollback()
+		return &video_pb.UploadVideoResponse{StatusCode: 1, StatusMsg: "创建数据库记录失败！"}, nil
+	}
+	tx.Commit()
 	//缓存删除（一致性）
 	err = cmdx.RedisClient.Del(ctx, "user:"+useridstring).Err()
 	if err != nil {
@@ -82,6 +90,7 @@ func (p *VideoServiceServer) UploadVideo(ctx context.Context, req *video_pb.Uplo
 
 	_, err = redisx.VideoCache(newVideo.ID)
 	if err != nil {
+
 		return nil, err
 	}
 
@@ -93,10 +102,43 @@ func (p *VideoServiceServer) PublishList(ctx context.Context, req *video_pb.Publ
 	var videos []model.Video
 	db := cmdx.DB
 
-	db.Preload("Author").Where("user_id = ?", userID).Find(&videos) //使用db.Preload("Author")预加载user表中"Author"信息，否则为0值
+	//db.Preload("Author").Where("user_id = ?", userID).Find(&videos) //使用db.Preload("Author")预加载user表中"Author"信息，否则为0值
+
+	db.Where("user_id = ?", userID).Find(&videos)
+
+	serviceHost := viper.GetString("userService.host")
+	servicePort := viper.GetString("userService.port")
+	serviceAddress := serviceHost + ":" + servicePort
+
+	conn, err := grpc.Dial(serviceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+
+	rpcclient := user_pb.NewUserServiceClient(conn)
+	req_user := &user_pb.UserInfoRequest{
+		UserId: userID,
+		Token:  req.Token,
+	}
+	user_res, err := rpcclient.GetUser(context.Background(), req_user)
+
+	if err != nil {
+		fmt.Println("错误:", err)
+	}
 
 	videos_msg := []*video_pb.VideoInfo{}
 	for i := range videos {
+		videos[i].Author.Avatar = user_res.User.Avatar
+		videos[i].Author.BackgroundImage = user_res.User.BackgroundImage
+		videos[i].Author.FavoriteCount = user_res.User.FavoriteCount
+		videos[i].Author.FollowCount = user_res.User.FollowCount
+		videos[i].Author.FollowerCount = user_res.User.FollowerCount
+		videos[i].Author.ID = user_res.User.Id
+		videos[i].Author.Name = user_res.User.Name
+		videos[i].Author.Signature = user_res.User.Signature
+		videos[i].Author.TotalFavorited = user_res.User.TotalFavorited
+		videos[i].Author.WorkCount = user_res.User.WorkCount
 		videos_msg = append(videos_msg, utils.ConvertVideoToProto(videos[i]))
 	}
 

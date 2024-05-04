@@ -8,11 +8,13 @@ Etcd:
 
 
 Nginx:
-  Addr: 10.23.65.182:80   
+  Addr: 10.23.65.216:80   
 
 VideoRpc:
- Endpoints:  
-        - 127.0.0.1:8083  #视频rpc端口
+  Etcd:
+    Hosts:
+    - 127.0.0.1:2379
+    Key: video.rpc
 
 MySQLDB:  
   DataSource: root:sql1515534009@tcp(127.0.0.1:3306)/chat?charset=utf8mb4&parseTime=True&loc=Local
